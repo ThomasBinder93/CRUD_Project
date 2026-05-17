@@ -1,0 +1,42 @@
+output-formats: colored-line-number
+linters:
+  enable:
+    - errcheck                # Errs that are not checked
+    - errname                 # Check error name conventions
+    - errorlint               # Source errors in error wrapping
+    - exhaustive              # Check exhaustiveness of enum switch
+    - gosimple                # Code simplification
+    - govet                   # Go vet
+    - ineffassign             # Ineffectual assignments
+    - lll                     # Line too long
+    - misspell                # Misspell
+    - prealloc                # Preallocate slices
+    - unconvert               # Unnecessary type conversions
+    - unused                  # Unused constants, variables, functions, types
+    - varnamelen              # Variable naming length
+    - whitespace              # Trailing whitespace
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - varnamelen
+    - linters:
+        - lll
+      source: "^//|SPDX-License"
+
+linters-settings:
+  lll:
+    line-length: 120
+  varnamelen:
+    min-name-length: 2
+    ignore-names:
+      - id
+      - db
+      - er
+      - ok
+      - i
+      - j
+      - w
+      - r
