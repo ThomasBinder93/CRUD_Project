@@ -19,8 +19,8 @@ func TestItemHandlerGetAll(t *testing.T) {
 	defer cleanup()
 
 	// Create test items
-	handler.repo.Create("Item 1")
-	handler.repo.Create("Item 2")
+	handler.repo.Create("Item 1", "First item description", "active")
+	handler.repo.Create("Item 2", "Second item description", "active")
 
 	req, _ := http.NewRequest(http.MethodGet, "/api/items", nil)
 	rr := httptest.NewRecorder()
@@ -45,7 +45,7 @@ func TestItemHandlerGetByID(t *testing.T) {
 	handler, cleanup := setupTestHandler(t)
 	defer cleanup()
 
-	created, _ := handler.repo.Create("Test Item")
+	created, _ := handler.repo.Create("Test Item", "Test item description", "active")
 
 	req := httptest.NewRequest(http.MethodGet, "/api/items/1", nil)
 	// Set the ID in the request context
@@ -135,7 +135,7 @@ func TestItemHandlerUpdate(t *testing.T) {
 	handler, cleanup := setupTestHandler(t)
 	defer cleanup()
 
-	created, _ := handler.repo.Create("Original Name")
+	created, _ := handler.repo.Create("Original Name", "Original description", "active")
 
 	reqBody := models.UpdateItemRequest{Name: "Updated Name"}
 	body, _ := json.Marshal(reqBody)
@@ -167,7 +167,7 @@ func TestItemHandlerDelete(t *testing.T) {
 	handler, cleanup := setupTestHandler(t)
 	defer cleanup()
 
-	handler.repo.Create("Item to Delete")
+	handler.repo.Create("Item to Delete", "Deletion description", "active")
 
 	req := httptest.NewRequest(http.MethodDelete, "/api/items/1", nil)
 	// Set the ID in the request context

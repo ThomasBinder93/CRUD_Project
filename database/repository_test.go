@@ -30,7 +30,7 @@ func TestRepositoryCreate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			item, err := repo.Create(tt.input)
+			item, err := repo.Create(tt.input, "test description", "active")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -47,9 +47,9 @@ func TestRepositoryGetAll(t *testing.T) {
 	defer cleanupTestDB(t, repo)
 
 	// Create test items
-	repo.Create("Item 1")
-	repo.Create("Item 2")
-	repo.Create("Item 3")
+	repo.Create("Item 1", "First item", "active")
+	repo.Create("Item 2", "Second item", "active")
+	repo.Create("Item 3", "Third item", "active")
 
 	items, err := repo.GetAll()
 	if err != nil {
@@ -67,7 +67,7 @@ func TestRepositoryGetByID(t *testing.T) {
 	defer cleanupTestDB(t, repo)
 
 	// Create a test item
-	created, _ := repo.Create("Test Item")
+	created, _ := repo.Create("Test Item", "Test item description", "active")
 
 	tests := []struct {
 		name    string
@@ -108,7 +108,7 @@ func TestRepositoryUpdate(t *testing.T) {
 	defer cleanupTestDB(t, repo)
 
 	// Create a test item
-	created, _ := repo.Create("Original Name")
+	created, _ := repo.Create("Original Name", "Original description", "active")
 
 	tests := []struct {
 		name    string
@@ -135,7 +135,7 @@ func TestRepositoryUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			item, err := repo.Update(tt.id, tt.newName)
+			item, err := repo.Update(tt.id, tt.newName, "Updated description", "completed")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -155,7 +155,7 @@ func TestRepositoryDelete(t *testing.T) {
 	defer cleanupTestDB(t, repo)
 
 	// Create a test item
-	created, _ := repo.Create("Item to Delete")
+	created, _ := repo.Create("Item to Delete", "Deletion description", "active")
 
 	tests := []struct {
 		name    string

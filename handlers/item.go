@@ -107,7 +107,7 @@ func (h *ItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := h.repo.Create(req.Name)
+	item, err := h.repo.Create(req.Name, req.Description, req.Status)
 	if err != nil {
 		h.logger.Error("failed to create item", slog.String("error", err.Error()))
 		_ = utils.WriteError(w, utils.ErrorInternalServer("failed to create item"))
@@ -149,7 +149,7 @@ func (h *ItemHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	item, err := h.repo.Update(id, req.Name)
+	item, err := h.repo.Update(id, req.Name, req.Description, req.Status)
 	if err != nil {
 		h.logger.Error("failed to update item", slog.String("error", err.Error()))
 		_ = utils.WriteError(w, utils.ErrorInternalServer("failed to update item"))
