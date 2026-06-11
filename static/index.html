@@ -17,11 +17,17 @@
 <div id="message" style="color: green; margin-bottom: 20px;"></div>
 
 <input id="nameInput" placeholder="Name">
+<input id="descriptionInput" placeholder="Description">
+<select id="statusInput">
+    <option value="active">active</option>
+    <option value="completed">completed</option>
+    <option value="archived">archived</option>
+</select>
 <button onclick="createItem()">Erstellen</button>
 
 <table id="list"></table>
 
     <script src="helper.js"></script>
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
 </body>
 </html>
