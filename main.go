@@ -24,8 +24,8 @@ func main() {
 	logger := setupLogger(cfg.Logger.Level)
 
 	logger.Info("starting application",
-		slog.String("version", "1.0.0-FIXED"),
-		slog.String("environment", "production"),
+		slog.String("version", cfg.App.Version),
+		slog.String("environment", cfg.App.Environment),
 	)
 
 	// Initialize database

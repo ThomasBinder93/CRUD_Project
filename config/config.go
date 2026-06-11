@@ -11,6 +11,7 @@ type Config struct {
 	Server ServerConfig
 	DB     DatabaseConfig
 	Logger LoggerConfig
+	App    AppConfig
 }
 
 // ServerConfig holds server-specific settings
@@ -31,6 +32,11 @@ type LoggerConfig struct {
 	Level string // debug, info, warn, error
 }
 
+type AppConfig struct {
+	Version     string
+	Environment string
+}
+
 // Load reads configuration from environment variables with defaults
 func Load() *Config {
 	return &Config{
@@ -45,6 +51,10 @@ func Load() *Config {
 		},
 		Logger: LoggerConfig{
 			Level: getEnv("LOG_LEVEL", "info"),
+		},
+		App: AppConfig{
+			Version:     getEnv("APP_VERSION", "1.0.0-FIXED"),
+			Environment: getEnv("APP_ENV", "production"),
 		},
 	}
 }

@@ -177,6 +177,8 @@ Configure the application using environment variables:
 | `SERVER_WRITE_TIMEOUT` | 15 | Write timeout in seconds |
 | `DB_PATH` | ./crud.db | SQLite database file path |
 | `LOG_LEVEL` | info | Logging level (debug, info, warn, error) |
+| `APP_VERSION` | 1.0.0-FIXED | Application version displayed in startup logs |
+| `APP_ENV` | production | Runtime environment displayed in startup logs |
 
 See `.env.example` for all available options.
 
