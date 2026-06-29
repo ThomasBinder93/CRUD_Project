@@ -1,5 +1,7 @@
 # CRUD Backend - Production-Grade Demo
 
+<img width="655" height="736" alt="image" src="https://github.com/user-attachments/assets/f030e542-26a6-4621-b89f-3fc65768b179" />
+
 A professional-grade REST API backend built with Go, showcasing best practices.
 
 ## Overview
