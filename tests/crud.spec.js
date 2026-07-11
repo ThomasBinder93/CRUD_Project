@@ -26,7 +26,7 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveCSS('color', 'rgb(0, 128, 0)'); // green
 
     // Check item appears in list
-    await expect(page.locator('#list')).toContainText(itemName);
+    await expect(page.locator(`#list input[value="${itemName}"]`)).toHaveCount(1);
   });
 
   test('should show error for empty item creation', async ({ page }) => {
