@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -162,7 +163,14 @@ func setupRouter(repo *database.Repository, logger *slog.Logger, cfg *config.Con
 
 	// Static files (Frontend) - served WITHOUT middleware
 	staticFS := http.FileServer(http.Dir("./static/"))
-	mux.Handle("/", staticFS)
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" || strings.HasSuffix(r.URL.Path, ".html") {
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		} else if strings.HasSuffix(r.URL.Path, ".js") {
+			w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+		}
+		staticFS.ServeHTTP(w, r)
+	}))
 
 	// Wrap everything with recovery and CORS middleware
 	return middleware.RecoveryMiddleware(logger)(
