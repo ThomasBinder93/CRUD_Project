@@ -57,11 +57,13 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveText('Item erfolgreich erstellt');
 
     // Find the item and update it
-    const itemRow = page.locator('#list tr').filter({ hasText: originalName });
+    const itemRow = page.locator('#list tr').filter({
+      has: page.locator(`input[value="${originalName}"]`),
+    });
     await expect(itemRow).toBeVisible();
 
     // Update the input field for that item
-    await itemRow.locator('input').fill(updatedName);
+    await itemRow.locator('input[id^="name-"]').fill(updatedName);
 
     // Click update button
     await itemRow.locator('button').filter({ hasText: 'Ändern' }).click();
@@ -70,8 +72,8 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveText('Item erfolgreich aktualisiert');
 
     // Check item was updated
-    await expect(page.locator('#list')).toContainText(updatedName);
-    await expect(page.locator('#list')).not.toContainText(originalName);
+    await expect(page.locator(`#list input[value="${updatedName}"]`)).toHaveCount(1);
+    await expect(page.locator(`#list input[value="${originalName}"]`)).toHaveCount(0);
   });
 
   test('should delete an item', async ({ page }) => {
@@ -83,7 +85,9 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveText('Item erfolgreich erstellt');
 
     // Find the item and delete it
-    const itemRow = page.locator('#list tr').filter({ hasText: itemName });
+    const itemRow = page.locator('#list tr').filter({
+      has: page.locator(`input[value="${itemName}"]`),
+    });
     await expect(itemRow).toBeVisible();
 
     // Click delete button
@@ -93,7 +97,7 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveText('Item erfolgreich gelöscht');
 
     // Check item was removed
-    await expect(page.locator('#list')).not.toContainText(itemName);
+    await expect(page.locator(`#list input[value="${itemName}"]`)).toHaveCount(0);
   });
 
   test('should handle update of empty name', async ({ page }) => {
@@ -105,8 +109,10 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveText('Item erfolgreich erstellt');
 
     // Find the item and try to update to empty
-    const itemRow = page.locator('#list tr').filter({ hasText: originalName });
-    await itemRow.locator('input').clear();
+    const itemRow = page.locator('#list tr').filter({
+      has: page.locator(`input[value="${originalName}"]`),
+    });
+    await itemRow.locator('input[id^="name-"]').clear();
 
     // Click update button
     await itemRow.locator('button').filter({ hasText: 'Ändern' }).click();
@@ -115,6 +121,6 @@ test.describe('CRUD Application', () => {
     await expect(page.locator('#message')).toHaveText('Fehler: item name cannot be empty');
 
     // Check item still has original name
-    await expect(page.locator('#list')).toContainText(originalName);
+    await expect(page.locator(`#list input[value="${originalName}"]`)).toHaveCount(1);
   });
 });
