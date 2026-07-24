@@ -9,6 +9,7 @@ help:
 	@echo "  make test         - Run tests with coverage"
 	@echo "  make test-unit    - Run unit tests only"
 	@echo "  make test-e2e     - Run end-to-end tests (requires Node.js and Playwright)"
+	@echo "  make test-selenium - Run Selenium browser tests (requires Python and Selenium)"
 	@echo "  make lint         - Run linter"
 	@echo "  make fmt          - Format code"
 	@echo "  make clean        - Clean build artifacts"
@@ -32,6 +33,9 @@ test-unit:
 
 test-e2e:
 	npm test
+
+test-selenium:
+	python -m unittest discover -s tests/selenium -p "test_*.py" -v
 
 lint:
 	golangci-lint run ./...

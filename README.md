@@ -111,10 +111,13 @@ make run            # Build and run
 make test           # Run tests with coverage report
 make test-unit      # Run unit tests only
 make test-e2e       # Run end-to-end tests (requires Node.js)
+make test-selenium  # Run Selenium browser tests (requires Python + Selenium)
 ```
 
 #### End-to-End Tests
 The project includes Playwright-based end-to-end tests that verify the full application functionality through the browser interface.
+
+The repository also includes a Selenium suite that mirrors the same CRUD scenarios for browser-based validation.
 
 **Setup:**
 ```bash
