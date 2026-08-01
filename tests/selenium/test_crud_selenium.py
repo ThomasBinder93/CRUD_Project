@@ -178,6 +178,71 @@ class CRUDSeleniumTests(unittest.TestCase):
         for name in names:
             self.assertTrue(self._find_item_row(name).is_displayed())
 
+    def test_server_error_handling_on_create(self):
+        self.driver.execute_script("""
+            window.__originalFetch = window.fetch;
+            window.fetch = function(url, options) {
+                if (options && options.method === 'POST' && url === '/api/items') {
+                    return Promise.resolve(new Response(JSON.stringify({ error: { details: 'internal server error' } }), {
+                        status: 500,
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
+                }
+                return window.__originalFetch(url, options);
+            };
+        """)
+
+        self.driver.find_element(By.ID, "nameInput").send_keys(f"ErrTest {int(time.time() * 1000)}")
+        self.driver.find_element(By.XPATH, "//button[normalize-space()='Erstellen']").click()
+        self._wait_for_message("Fehler: internal server error", is_error=True)
+
+    def test_show_error_on_update_delete_404(self):
+        self.driver.execute_script("""
+            window.__originalFetch = window.fetch;
+            window.fetch = function(url, options) {
+                const method = (options && options.method) || 'GET';
+                if (method === 'POST' && url === '/api/items') {
+                    return window.__originalFetch(url, options);
+                }
+                if ((method === 'PUT' || method === 'DELETE') && String(url).includes('/api/items/')) {
+                    return Promise.resolve(new Response(JSON.stringify({ error: { details: 'not found' } }), {
+                        status: 404,
+                        headers: { 'Content-Type': 'application/json' }
+                    }));
+                }
+                return window.__originalFetch(url, options);
+            };
+        """)
+
+        item_name = f"ToBeNotFound {int(time.time() * 1000)}"
+        self._create_item(item_name)
+        self._wait_for_message("Item erfolgreich erstellt")
+
+        row = self._find_item_row(item_name)
+        row.find_element(By.XPATH, ".//button[normalize-space()='Ändern']").click()
+        self._wait_for_message("Fehler: not found", is_error=True)
+
+        row = self._find_item_row(item_name)
+        row.find_element(By.XPATH, ".//button[normalize-space()='Löschen']").click()
+        self._wait_for_message("Fehler: not found", is_error=True)
+
+    def test_xss_sanitization_no_dialogs_executed(self):
+        payload = "<script>window.__XSS=1;</script>"
+        self.driver.execute_script("""
+            window.__dialogMessages = [];
+            window.alert = function(message) { window.__dialogMessages.push(String(message)); };
+            window.confirm = function(message) { window.__dialogMessages.push(String(message)); return false; };
+            window.prompt = function(message, defaultValue) { window.__dialogMessages.push(String(message)); return defaultValue; };
+        """)
+
+        self.driver.find_element(By.ID, "nameInput").send_keys(payload)
+        self.driver.find_element(By.XPATH, "//button[normalize-space()='Erstellen']").click()
+        self._wait_for_message("Item erfolgreich erstellt")
+
+        dialogs_seen = self.driver.execute_script("return (window.__dialogMessages || []).length")
+        self.assertEqual(0, dialogs_seen)
+        self.assertTrue(len(self.driver.find_elements(By.XPATH, f"//input[@value='{payload}']")) >= 1)
+
     def test_accessibility_smoke_keyboard_focus_order(self):
         self.driver.find_element(By.ID, "nameInput").click()
         ActionChains(self.driver).send_keys(Keys.TAB).perform()
