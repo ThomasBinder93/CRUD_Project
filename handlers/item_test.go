@@ -41,6 +41,37 @@ func TestItemHandlerGetAll(t *testing.T) {
 	}
 }
 
+func TestItemHandlerGetAllSearch(t *testing.T) {
+	handler, cleanup := setupTestHandler(t)
+	defer cleanup()
+
+	handler.repo.Create("Alpha Item", "First item description", "active")
+	handler.repo.Create("Beta Item", "Second item description", "completed")
+	handler.repo.Create("Gamma Item", "Third item description", "archived")
+
+	req, _ := http.NewRequest(http.MethodGet, "/api/items?search=alpha", nil)
+	rr := httptest.NewRecorder()
+
+	handler.GetAll(rr, req)
+
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+	}
+
+	var response struct {
+		Data []models.Item `json:"data"`
+	}
+	json.NewDecoder(rr.Body).Decode(&response)
+
+	if len(response.Data) != 1 {
+		t.Fatalf("GetAll() search returned %d items, want 1", len(response.Data))
+	}
+
+	if response.Data[0].Name != "Alpha Item" {
+		t.Errorf("GetAll() search returned name %q, want %q", response.Data[0].Name, "Alpha Item")
+	}
+}
+
 func TestItemHandlerGetByID(t *testing.T) {
 	handler, cleanup := setupTestHandler(t)
 	defer cleanup()

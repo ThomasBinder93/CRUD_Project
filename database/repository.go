@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 
 	"CRUD_Project/models"
@@ -100,12 +101,21 @@ func (r *Repository) getTableColumns(tableName string) (map[string]bool, error) 
 	return cols, nil
 }
 
-// GetAll retrieves all items from the database
-func (r *Repository) GetAll() ([]models.Item, error) {
+// GetAll retrieves all items from the database, optionally filtered by a search term.
+func (r *Repository) GetAll(search string) ([]models.Item, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	rows, err := r.db.Query("SELECT id, name, description, status FROM items ORDER BY id")
+	query := "SELECT id, name, description, status FROM items"
+	args := []interface{}{}
+	if search != "" {
+		query += " WHERE LOWER(name) LIKE ? OR LOWER(description) LIKE ?"
+		pattern := "%" + strings.ToLower(search) + "%"
+		args = append(args, pattern, pattern)
+	}
+	query += " ORDER BY id"
+
+	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query items: %w", err)
 	}

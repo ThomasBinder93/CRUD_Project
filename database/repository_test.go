@@ -51,7 +51,7 @@ func TestRepositoryGetAll(t *testing.T) {
 	repo.Create("Item 2", "Second item", "active")
 	repo.Create("Item 3", "Third item", "active")
 
-	items, err := repo.GetAll()
+	items, err := repo.GetAll("")
 	if err != nil {
 		t.Errorf("GetAll() error = %v", err)
 		return

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"CRUD_Project/database"
 	"CRUD_Project/models"
@@ -41,7 +42,9 @@ func NewItemHandler(repo *database.Repository, logger *slog.Logger) *ItemHandler
 // @Success 200 {object} utils.SuccessResponse
 // @Router /api/items [get]
 func (h *ItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	items, err := h.repo.GetAll()
+	search := strings.TrimSpace(r.URL.Query().Get("search"))
+
+	items, err := h.repo.GetAll(search)
 	if err != nil {
 		h.logger.Error("failed to get items", slog.String("error", err.Error()))
 		_ = utils.WriteError(w, utils.ErrorInternalServer("failed to retrieve items"))

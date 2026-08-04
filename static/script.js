@@ -1,8 +1,14 @@
 
     const API = "/api/items";
+    let currentSearch = "";
 
-    async function loadItems() {
-        const res = await fetch(API);
+    async function loadItems(search = currentSearch) {
+        const params = new URLSearchParams();
+        if (search) {
+            params.set("search", search);
+        }
+
+        const res = await fetch(`${API}?${params.toString()}`);
         const json = await res.json();
         const items = Array.isArray(json) ? json : json?.data ?? [];
 
@@ -22,6 +28,31 @@
                             <td><button onclick="updateItem(${item.id}, getValue('name-${item.id}'), getValue('description-${item.id}'), getValue('status-${item.id}'))">Ändern</button>
                                 <button onclick="deleteItem(${item.id})">Löschen</button></td>`;
             list.appendChild(tr);
+        });
+    }
+
+    async function searchItems() {
+        currentSearch = getValue("searchInput").trim();
+        await loadItems(currentSearch);
+    }
+
+    async function clearSearch() {
+        get("searchInput").value = "";
+        currentSearch = "";
+        await loadItems();
+    }
+
+    function setupSearch() {
+        const searchInput = get("searchInput");
+        if (!searchInput) {
+            return;
+        }
+
+        searchInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                searchItems();
+            }
         });
     }
 
@@ -46,7 +77,7 @@
         get("nameInput").value = "";
         get("descriptionInput").value = "";
         get("statusInput").value = "active";
-        loadItems();
+        loadItems(currentSearch);
         showMessage("Item erfolgreich erstellt");
     }
 
@@ -66,7 +97,7 @@
         }
 
 
-        loadItems();
+        loadItems(currentSearch);
         showMessage("Item erfolgreich aktualisiert");
     }
 
@@ -81,9 +112,10 @@
             return;
         }
 
-        loadItems();
+        loadItems(currentSearch);
         showMessage("Item erfolgreich gelöscht");
     }
 
+    setupSearch();
     loadItems();
 
